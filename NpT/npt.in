@@ -1,0 +1,48 @@
+### DEFINE SIMULATION BOX GEOMETRY ###
+lattice sc 0.8
+region box block 0 10 0 10 0 10
+create_box 1 box
+create_atoms 1 box
+
+### DEFINE PHYSICAL PROPERTIES OF ATOMS ###
+mass 1 1.0
+pair_style lj/cut/opt 3.0
+pair_coeff 1 1 1.0 1.0
+neighbor 2.0 bin
+
+### SPECIFY THE REQUIRED THERMODYNAMIC STATE ###
+variable T equal 1.5
+variable p equal 1.0
+variable timestep equal 0.002
+
+### ASSIGN ATOMIC VELOCITIES ###
+velocity all create ${T} 12345 dist gaussian rot yes mom yes
+
+### SPECIFY ENSEMBLE ###
+timestep ${timestep}
+fix nve all nve
+
+### THERMODYNAMIC OUTPUT CONTROL ###
+thermo_style custom time etotal temp press
+thermo 10
+
+### RECORD TRAJECTORY ###
+dump traj all custom 10 output-1 id x y z
+
+### SPECIFY TIMESTEP ###
+
+### RUN SIMULATION TO MELT CRYSTAL ###
+run 10000
+unfix nve
+reset_timestep 0
+
+### BRING SYSTEM TO REQUIRED STATE ###
+variable tdamp equal ${timestep}*100
+variable pdamp equal ${timestep}*1000
+fix npt all npt temp ${T} ${T} ${tdamp} iso ${p} ${p} ${pdamp}
+run 10000
+reset_timestep 0
+
+### MEASURE SYSTEM STATE ###
+thermo_style custom step etotal temp press density
+run 50000
