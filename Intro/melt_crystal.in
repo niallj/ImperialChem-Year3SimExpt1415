@@ -20,6 +20,9 @@ fix nve all nve
 thermo_style custom time etotal temp press
 thermo 10
 
+### RECORD TRAJECTORY ###
+dump traj all custom 10 output-1 id x y z
+
 ### SPECIFY TIMESTEP ###
 variable timestep equal 0.02
 variable n_steps equal floor(100/${timestep})
