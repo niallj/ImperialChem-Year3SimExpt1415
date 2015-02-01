@@ -37,7 +37,6 @@ class MainWindow:
                 ("load", self.Button("load", "Load", self._load)),
                 ("unload", self.Button("unload", "Unload", self._unload)),
                 ("manage", self.Button("manage", "Manage", self._manage)),
-                ("labels", self.Button("labels", "Titles/Legend", self._labels)),
                 ("quit", self.Button("quit", "Quit", self._quit)),
         ])
 
@@ -63,9 +62,6 @@ class MainWindow:
     def _manage(self):
         self.file_list.manage()
         self.mpl_obj.replot(self.file_list.name2ds)
-
-    def _labels(self):
-        pass
 
     def _quit(self):
         self.root.quit()
