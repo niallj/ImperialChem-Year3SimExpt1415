@@ -1,6 +1,6 @@
 ### DEFINE SIMULATION BOX GEOMETRY ###
 lattice sc 0.8
-region box block 0 10 0 10 0 10
+region box block 0 15 0 15 0 15
 create_box 1 box
 create_atoms 1 box
 
@@ -11,9 +11,9 @@ pair_coeff 1 1 1.0 1.0
 neighbor 2.0 bin
 
 ### SPECIFY THE REQUIRED THERMODYNAMIC STATE ###
-variable T equal 1.5
-variable p equal 1.0
-variable timestep equal 0.002
+variable T equal ...
+variable p equal ...
+variable timestep equal ...
 
 ### ASSIGN ATOMIC VELOCITIES ###
 velocity all create ${T} 12345 dist gaussian rot yes mom yes
@@ -27,7 +27,7 @@ thermo_style custom time etotal temp press
 thermo 10
 
 ### RECORD TRAJECTORY ###
-dump traj all custom 10 output-1 id x y z
+dump traj all custom 1000 output-1 id x y z
 
 ### SPECIFY TIMESTEP ###
 
@@ -45,4 +45,27 @@ reset_timestep 0
 
 ### MEASURE SYSTEM STATE ###
 thermo_style custom step etotal temp press density
-run 50000
+variable dens equal density
+variable dens2 equal density*density
+variable temp equal temp
+variable temp2 equal temp*temp
+variable press equal press
+variable press2 equal press*press
+fix aves all ave/time 100 1000 100000 v_dens v_temp v_press v_dens2 v_temp2 v_press2
+run 100000
+
+variable avedens equal f_aves[1]
+variable avetemp equal f_aves[2]
+variable avepress equal f_aves[3]
+variable errdens equal sqrt(f_aves[4]-f_aves[1]*f_aves[1])
+variable errtemp equal sqrt(f_aves[5]-f_aves[2]*f_aves[2])
+variable errpress equal sqrt(f_aves[6]-f_aves[3]*f_aves[3])
+
+print "Averages"
+print "--------"
+print "Density: ${avedens}"
+print "Stderr: ${errdens}"
+print "Temperature: ${avetemp}"
+print "Stderr: ${errtemp}"
+print "Pressure: ${avepress}"
+print "Stderr: ${errpress}"
