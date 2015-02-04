@@ -1,0 +1,35 @@
+### DEFINE SIMULATION BOX GEOMETRY ###
+variable density equal 0.8
+variable temperature equal 1.2
+variable timestep equal 0.002
+
+lattice sc ${density}
+region box block 0 15 0 15 0 15
+create_box 1 box
+create_atoms 1 box
+
+### DEFINE PHYSICAL PROPERTIES OF ATOMS ###
+mass 1 1.0
+pair_style lj/cut 3.2
+pair_coeff 1 1 1.0 1.0
+neighbor 2.0 bin
+
+### ASSIGN ATOMIC VELOCITIES ###
+velocity all create ${temperature} 12345 dist gaussian rot yes mom yes
+
+### SPECIFY ENSEMBLE ###
+timestep ${timestep}
+
+### THERMODYNAMIC OUTPUT CONTROL ###
+thermo_style custom step time etotal temp press
+thermo 100
+
+### BRING SYSTEM TO REQUIRED STATE ###
+variable tdamp equal ${timestep}*100
+fix nvt all nvt temp ${temperature} ${temperature} ${tdamp}
+run 10000
+reset_timestep 0
+
+### RECORD TRAJECTORY ###
+dump traj all custom 100 output-1 id x y z
+run 30000
