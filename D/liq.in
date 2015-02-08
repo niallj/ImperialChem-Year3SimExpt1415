@@ -1,4 +1,3 @@
-### DEFINE SIMULATION BOX GEOMETRY ###
 variable density equal 0.8
 variable temperature equal 1.2
 variable timestep equal 0.002
@@ -8,23 +7,17 @@ region box block 0 20 0 20 0 20
 create_box 1 box
 create_atoms 1 box
 
-### DEFINE PHYSICAL PROPERTIES OF ATOMS ###
 mass 1 1.0
 pair_style lj/cut 3.2
 pair_coeff 1 1 1.0 1.0
 neighbor 2.0 bin
 
-### ASSIGN ATOMIC VELOCITIES ###
 velocity all create ${temperature} 12345 dist gaussian rot yes mom yes
-
-### SPECIFY ENSEMBLE ###
 timestep ${timestep}
 
-### THERMODYNAMIC OUTPUT CONTROL ###
 thermo_style custom step time etotal temp press
 thermo 100
 
-### BRING SYSTEM TO REQUIRED STATE ###
 variable tdamp equal ${timestep}*100
 fix nvt all nvt temp ${temperature} ${temperature} ${tdamp}
 run 10000
@@ -32,8 +25,7 @@ reset_timestep 0
 
 compute msd all msd
 compute vacf all vacf
-fix amsd all ave/time 1 1 1 c_msd[1] c_msd[2] c_msd[3] c_msd[4] file msd.dat
-fix avacf all ave/time 1 1 1 c_vacf[1] c_vacf[2] c_vacf[3] c_vacf[4] file vacf.dat
+fix amsd all ave/time 1 1 1 c_msd[1] c_msd[2] c_msd[3] c_msd[4] file output-2
+fix avacf all ave/time 1 1 1 c_vacf[1] c_vacf[2] c_vacf[3] c_vacf[4] file output-3
 
-### RECORD TRAJECTORY ###
 run 5000
